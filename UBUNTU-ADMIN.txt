@@ -1,0 +1,118 @@
+============================================================UBUNTU Admin=================================================================
+/// PROCESS MANAGEMENT
+
+systemctl
+systemctl -l ssh
+
+========================================================NETWORKING===========================================================================
+ss -4altunp | grep 514   // chk listening ports
+
+----------------------------------------------------check memory usage---------------------------------------------------------------------------
+free -m
+cat /proc/sys/vm/swappiness
+
+-------------------------------------------------------CHK Disk usage -----------------------------------------------------------------------------
+
+du -hsc *  //equal to directory tree usage in GB
+df -Th
+df -h
+----------------------------------------------------Extened Volume in Existing Disk-------------------------------------------------------------------
+
+df -h  //note partition 
+sudo pvs 
+sudo vgdisplay
+sudo lvdisplay 
+sudo lvdisplay /dev/vg0/lv0
+sudo lvmdiskscan
+sudo pvresize /dev/sdb
+sudo growpart /dev/sdb 1  | use in case of partition
+sudo growpart /dev/mapper/vg0-lv0 *not working
+sudo vgextend  /dev/vg0/lv0
+sudo lvextend -r -l +100%FREE  /dev/vg0/lv0
+sudo resize2fs -p /dev/mapper/vg0-lv0
+sudo resize2fs  /dev/mapper/vg0-lv0
+
+--------------------------------------------------------------------------------download and install------------------------------------
+wget https://raw.githubusercontent.com/Microsoft/OMS-Agent-for-Linux/master/installer/scripts/onboard_agent.sh && sh onboard_agent.sh -w 82a797d7-0b8c-4f2d-b30c-61cde01dff7c -s EqwNbIii31NdwMyFxShYtlOpOKxbFLTUR3PFl4eV27bkNjFlMQreooBCuph9bhOmXvlcpWrJSR8NA7qW0q5oRg==
+
+--------------------------------------------------------------------------------------NETWORKING-------------------------------------------
+
+disable IPV6
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+================================================================LOG ANALYSIS==================================================================
+
+du -hs syslog   //check log file size
+>syslog         // clear file content
+
+
+https://linuxsecurity.com/features/linux-log-analysis
+
+For understanding where log-ins are coming from on a server
+-----------------------------------------------------------------------------------------------------------------------------------------------
+grep -E "192\.168\.0\.3" /var/log/syslog | wc -l
+
+For This command parses the output of the who command to show the names of the users currently logged into the system
+------------------------------------------------------------------------------------------------------------------------------------------------
+
+who | cut -c 1-16
+
+For logs last line
+-------------------------------------------------------------------------------------------------------------------------------------------------
+
+tail -f /var/log/auth.log   //f stand for append
+
+use case for this command is if a user needs to see logs from that day precisely
+-------------------------------------------------------------------------------------------------------------------------------------------------
+
+sed "s/May 11//g" /var/log/auth.log > newfile.txt  //s = stream ,g = copy & search for lines that contain the string ‘May 11’ 
+
+To extract usrname,ip address for any word 
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+awk "/.*Failed password.*/ { print $8 }" /var/log/auth.log  // print $8 =out 8 lines only for string :Failed password"
+
+look for the timestamps, IP addresses, and hostnames of logs that indicate suspicious behavior.  
+---------------------------------------------------------------------------------------------------------------------------------------------------
+
+grep -E "192\.168\.0\.\d{1,3}" /var/log/syslog    //Contain something
+
+grep -v -E "192\.168\.0\.\d{1,3}" /var/log/syslog  //Do not Contain something
+ 
+========================================================MEMORY ANALYSIS & SETTINGS============================================================
+
+ ps aux --sort=-%mem | grep elastic+    //sort memory usage
+ 
+ pstree                  // show tree like memory usage
+ 
+ smem -r   // details meory usage viwe
+ 
+ htop
+ 
+ top
+ 
+sudo systemctl status elasticsearch.service  // To check memory limit
+ 
+sudo systemd-cgtop -n 1 | grep elasticsearch  // Verify memory limit
+
+ulimit -v 12582912    // To set memory limit 12GB user shell level
+
+----------to set system level memory usage for a process----------------------------------------------
+
+nano /etc/systemd/system/elasticsearch.service.d/startup-timeout.conf
+
+make entry --> MemoryLimit=14G   to limit 14 GB memory usage
+
+sudo systemctl daemon-reload
+
+sudo systemctl stop elasticsearch.service
+
+sudo systemctl start elasticsearch.service
+
+
+
+  
+ 
+ 
+
+
