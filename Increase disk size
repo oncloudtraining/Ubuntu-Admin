@@ -1,0 +1,17 @@
+---------------------------------------------------Extened Volume in Existing Disk OR Increase disk size-------------------------------------------
+
+df -h  //note partition 
+sudo pvs 
+sudo vgdisplay
+sudo lvdisplay 
+sudo lvdisplay /dev/vg0/lv0
+sudo lvmdiskscan
+sudo pvresize /dev/sdb
+sudo growpart /dev/sdb 1  | use in case of partition
+sudo growpart /dev/mapper/vg0-lv0 *not working
+sudo vgextend  /dev/vg0/lv0
+sudo lvextend -r -l +100%FREE  /dev/vg0/lv0
+sudo resize2fs -p /dev/mapper/vg0-lv0  //-p option shows progress
+sudo resize2fs  /dev/mapper/vg0-lv0
+
+lvextend -l +100%FREE /dev/vg0/lv0 //worked in elk vm after reboot
